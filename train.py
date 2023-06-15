@@ -81,8 +81,8 @@ if __name__ == "__main__":
     model = PPO("MlpPolicy", vec_env, verbose=1, tensorboard_log=LOG_DIR)
     
     callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=LOG_DIR)
-    model.learn(total_timesteps=TIMESTEPS, callback=callback)
-    model.save(f"{MODELS_DIR}/galaxian-ai-v6-{TIMESTEPS}")
+    model.learn(total_timesteps=TIMESTEPS, callback=callback, tb_log_name="PPO-17-MLP-SOBC-VECM")
+    model.save(f"{MODELS_DIR}/galaxian-ai-v7-{TIMESTEPS}")
 
 
 
