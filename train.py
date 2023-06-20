@@ -10,7 +10,7 @@ from stable_baselines3.common.vec_env import VecMonitor
 from stable_baselines3.common.results_plotter import load_results, ts2xy
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3 import PPO
-
+#from stable_baselines3.common.atari_wrappers import MaxAndSkipEnv
 
 MODELS_DIR = "models/PPO"
 LOG_DIR="logs"
@@ -60,9 +60,9 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
         return True
 
-def make_env(env_id, rank, seed=0):
+def make_env(env_id, rank, seed = 0):
     def _init():
-        env = gym.make(env_id)
+        env = gym.make(env_id,obs_type="rgb",frameskip=4, repeat_action_probability=0.25)
         env.reset(seed=seed + rank)
         return env
     set_random_seed(seed)
@@ -77,12 +77,12 @@ if __name__ == "__main__":
     
     env_id = "ALE/Galaxian-v5"
     num_cpu = 4
-    vec_env = VecMonitor(SubprocVecEnv([make_env(env_id, i) for i in range(num_cpu)]))
-    model = PPO("MlpPolicy", vec_env, verbose=1, tensorboard_log=LOG_DIR)
+    vec_env = VecMonitor(SubprocVecEnv([make_env(env_id, i) for i in range(num_cpu)]),"logs/testMonitor")
+    model = PPO("CnnPolicy", vec_env, verbose=1, tensorboard_log=LOG_DIR, learning_rate=0.0001, batch_size=128)
     
     callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=LOG_DIR)
-    model.learn(total_timesteps=TIMESTEPS, callback=callback, tb_log_name="PPO-17-MLP-SOBC-VECM")
-    model.save(f"{MODELS_DIR}/galaxian-ai-v7-{TIMESTEPS}")
+    model.learn(total_timesteps=TIMESTEPS, callback=callback, tb_log_name="PPO-CNN-LR0001")
+    model.save(f"{MODELS_DIR}/galaxian-ai-(v3)-{TIMESTEPS}")
 
 
 
