@@ -62,7 +62,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
 
 def make_env(env_id, rank, seed = 0):
     def _init():
-        env = gym.make(env_id,obs_type="rgb",frameskip=4, repeat_action_probability=0.25)
+        env = gym.make(env_id,obs_type="rgb")
         env.reset(seed=seed + rank)
         return env
     set_random_seed(seed)
@@ -76,13 +76,13 @@ if __name__ == "__main__":
         os.makedirs(LOG_DIR)
     
     env_id = "ALE/Galaxian-v5"
-    num_cpu = 4
+    num_cpu = 8
     vec_env = VecMonitor(SubprocVecEnv([make_env(env_id, i) for i in range(num_cpu)]),"logs/testMonitor")
-    model = PPO("CnnPolicy", vec_env, verbose=1, tensorboard_log=LOG_DIR, learning_rate=0.0001, batch_size=128)
+    model = PPO("CnnPolicy", vec_env, verbose=1, tensorboard_log=LOG_DIR, learning_rate=0.00001)
     
     callback = SaveOnBestTrainingRewardCallback(check_freq=1000, log_dir=LOG_DIR)
-    model.learn(total_timesteps=TIMESTEPS, callback=callback, tb_log_name="PPO-CNN-LR0001")
-    model.save(f"{MODELS_DIR}/galaxian-ai-(v3)-{TIMESTEPS}")
+    model.learn(total_timesteps=TIMESTEPS, callback=callback, tb_log_name="PPO-LR0001-")
+    model.save(f"{MODELS_DIR}/galaxian-ai-(v6)-{TIMESTEPS}")
 
 
 
